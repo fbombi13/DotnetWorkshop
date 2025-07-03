@@ -36,7 +36,7 @@ dotnet add package WebDriverManager
 
 Copy this:
 
-```bash
+```csharp
     private static readonly string _BASE_URL = "https://epam.com/";
     private readonly By _careersLink = By.LinkText("Careers");
     private readonly By _searchFormWrapper = By.Id("jobSearchFilterForm");
