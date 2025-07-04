@@ -36,7 +36,7 @@ dotnet add package WebDriverManager
 
 Copy this:
 
-```csharp
+```bash
     private static readonly string _BASE_URL = "https://epam.com/";
     private readonly By _careersLink = By.LinkText("Careers");
     private readonly By _searchFormWrapper = By.Id("jobSearchFilterForm");
@@ -62,25 +62,69 @@ Copy this:
 
 #### _Hint: Instantiate DriverManager_
 
+
+## Step 7: Explicit waits
+```csharp
+ var revealed = driver.FindElement(By.Id("revealed"));
+ WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
+ wait.Until(d => revealed.Displayed);
+```
+## Step 8: Add Test
+### Test 1:
+ Create multiple tests
+ ```csharp       
+ // Navigate to https://www.epam.com/
+ _driver.FindElement(_magnifierIcon).Click();
+ // Find a magnifier icon and click on it
+ _driver.FindElement(_seachInput).SendKeys(searchParam);
+ // Find a search string and put there
+ _driver.FindElement(_findButton).Click();
+ WaitFor(_driver, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(1))
+     .Until((driver) => !driver.FindElement(_preloader).Displayed);
+ // Validate all links contain searched word
+ ReadOnlyCollection<IWebElement> articles = _driver.FindElements(_articlesFound);
+ List<string> invalidItems = articles
+      .Where(article => !article.Text.Contains(searchParam.Replace("\"", ""), StringComparison.CurrentCultureIgnoreCase))
+            .Select(article => article.Text)
+            .ToList();
+  Assert.That(invalidItems, Is.Empty, $"Invalid Items: {string.Join(',',invalidItems)}");
+```
+### Test 2
+```csharp
+driver.FindElement(_careersLink).Click();
+// Write the name of any programming language in the field "Keywords" (should be tafrom test parameter)
+var searchForm = driver.FindElement(_searchFormWrapper);
+//_driver.FindElement(_searchFromInput).Click();
+searchForm.FindElement(_searchFormKeyword).SendKeys(languageName);
+//WaitFor(_driver, TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(100)).U((driver) => searchForm.FindElement(By.ClassName("autocomplete-suggestions")).Displayed);
+// Select "All locations" in the "Location" field (should be taken from the tparameter)
+searchForm.FindElement(_searchFormLocation).Click();
+searchForm.FindElement(_searchFormLocationAllLocations).Click();
+searchForm.FindElement(_searchFormLocationLabel).Click();
+```
+
 ## Step 7: Create Folder Structure
 
 - Create Pages folder
 - Create Tests
     - Move current test file into that folder, also rename if you want 
 
-## Step 8: Add Actions into POM
+## Step 8: Create a partial class
+  _Hint: Start under 'pages' folder create 2 files, `EpamPage.actions.cs` and `EpamPage.locators.cs`_
 
-## Step 9: Add configuration file for testing
+## Step 9: Add Actions into POM
+
+## Step 10: Add configuration file for testing
 Create an `appsettings.json` file
 
 
-## Step 10: Add JSON Handler package
+## Step 11: Add JSON Handler package
 
 ```bash
 dotnet add package Microsoft.Extensions.Configuration.Json
 ```
 
-## Step 11: Complete 'appsettings.json'
+## Step 12: Complete 'appsettings.json'
 ```JSON
 {
   "TestSettings": {
@@ -91,12 +135,12 @@ dotnet add package Microsoft.Extensions.Configuration.Json
 }
 ```
 
-## Step 12: Run tests
+## Step 13: Run tests
 ```bash
 dotnet test
 ```
 
-## Step 13: Copy 'appsettings' on compiled area
+## Step 14: Copy 'appsettings' on compiled area
 ```xml
 <ItemGroup>
   <None Update="appsettings.json">
@@ -105,7 +149,7 @@ dotnet test
 </ItemGroup>
 ```
 
-## Step 14: Configure IConfiguration
+## Step 15: Configure IConfiguration
 ```csharp
  var builder = new ConfigurationBuilder()
     .SetBasePath(TestContext.CurrentContext.TestDirectory) // Set the base path
